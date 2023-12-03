@@ -57,14 +57,16 @@ program : program unit
 
 unit : var_declaration
 	 {
-		$$ = $1;
+		TreeNode* node = TreeNode::createNonTerminalNode("unit");
+		node->addChild($1->getNode());
+		$$ = new symbol_info("unit", "non_terminal", node);
 	 }
 	 | func_definition
 	 {
-		$$ = $1;
+		TreeNode* node = TreeNode::createNonTerminalNode("unit");
+		node->addChild($1->getNode());
+		$$ = new symbol_info("unit", "non_terminal", node);
 
-		
-		
 	 }
 
      ;
@@ -82,13 +84,13 @@ func_definition : type_specifier id_name LPAREN parameter_list RPAREN compound_s
 		}
 		| type_specifier id_name LPAREN RPAREN compound_statement 
 		{
-			TreeNode* node = TreeNode::createNonTerminalNode("func_definition"); /// WILL THERE
+			TreeNode* node = TreeNode::createNonTerminalNode("func_definition");
 			node->addChild($1->getNode());
 			node->addChild($2->getNode());
 			node->addChild(TreeNode::createTerminalNode("LPAREN", "("));
 			node->addChild(TreeNode::createTerminalNode("RPAREN", ")"));
 			node->addChild($5->getNode());
-			$$ = new symbol_info("func_definition", "non_terminal", node); /// WILL THERE 
+			$$ = new symbol_info("func_definition", "non_terminal", node);
 			
 		}
  		;
@@ -99,7 +101,7 @@ parameter_list : parameter_list COMMA type_specifier ID
 			node->addChild($1->getNode());
 			node->addChild(TreeNode::createTerminalNode("COMMA", ","));
 			node->addChild($3->getNode());
-			node->addChild($4->getNode());
+			node->addChild(TreeNode::createTerminalNode("ID", $4->getname().c_str()));
 			$$ = new symbol_info("parameter_list", "non_terminal", node);
 			
 		}
@@ -116,15 +118,13 @@ parameter_list : parameter_list COMMA type_specifier ID
  		{
 			TreeNode* node = TreeNode::createNonTerminalNode("parameter_list");
 			node->addChild($1->getNode());
-			node->addChild($2->getNode());
+			node->addChild(TreeNode::createTerminalNode("ID", $2->getname().c_str()));
 			$$ = new symbol_info("parameter_list", "non_terminal", node);
 			
 		}
 		| type_specifier
 		{
-			TreeNode* node = TreeNode::createNonTerminalNode("parameter_list");
-			node->addChild($1->getNode());
-			$$ = new symbol_info("parameter_list", "non_terminal", node);
+			$$ = new symbol_info("type_specifier", "terminal", $1->getNode());
 			
 		}
  		;
@@ -143,7 +143,7 @@ compound_statement : LCURL statements RCURL
 			TreeNode* node = TreeNode::createNonTerminalNode("compound_statement");
 			node->addChild(TreeNode::createTerminalNode("LCURL", "{"));
 			node->addChild(TreeNode::createTerminalNode("RCURL", "}"));
-			$$ = new symbol_info("compound_statement", "non_terminal", node); 
+			$$ = new symbol_info("compound_statement", "non_terminal", node);
  			
 		}
 		;
@@ -187,16 +187,14 @@ declaration_list : declaration_list COMMA id_name
 			node->addChild(TreeNode::createTerminalNode("COMMA", ","));
 			node->addChild($3->getNode());
 			node->addChild(TreeNode::createTerminalNode("LTHIRD", "["));
-			node->addChild(TreeNode::createTerminalNode("CONST_INT", $5->getname().c_str()));
+			node->addChild($5->getNode());
 			node->addChild(TreeNode::createTerminalNode("RTHIRD", "]"));
 			$$ = new symbol_info("declaration_list", "non_terminal", node);
 			
 		}
 		| id_name
 		{
-			TreeNode* node = TreeNode::createNonTerminalNode("declaration_list");
-			node->addChild($1->getNode());
-			$$ = new symbol_info("declaration_list", "non_terminal", node);
+			$$ = new symbol_info("id_name", "terminal", $1->getNode());
 			
 
 		}
@@ -205,7 +203,7 @@ declaration_list : declaration_list COMMA id_name
 			TreeNode* node = TreeNode::createNonTerminalNode("declaration_list");
 			node->addChild($1->getNode());
 			node->addChild(TreeNode::createTerminalNode("LTHIRD", "["));
-			node->addChild(TreeNode::createTerminalNode("CONST_INT", $3->getname().c_str()));
+			node->addChild($3->getNode());
 			node->addChild(TreeNode::createTerminalNode("RTHIRD", "]"));
 			$$ = new symbol_info("declaration_list", "non_terminal", node);
 			
@@ -237,17 +235,23 @@ statements : statement
 
 statement : var_declaration
 	  {
-		$$ = $1;
+		TreeNode* node = TreeNode::createNonTerminalNode("statement");
+	    node->addChild($1->getNode());
+	    $$ = new symbol_info("statement", "non_terminal", node);
 	    	
 	  }
 	  | expression_statement
 	  {
-		$$ = $1;
+		TreeNode* node = TreeNode::createNonTerminalNode("statement");
+	    node->addChild($1->getNode());
+	    $$ = new symbol_info("statement", "non_terminal", node);
 	    	
 	  }
 	  | compound_statement
 	  {
-		$$ = $1;
+		TreeNode* node = TreeNode::createNonTerminalNode("statement");
+	    node->addChild($1->getNode());
+	    $$ = new symbol_info("statement", "non_terminal", node);
 	    	
 	    	
 	  }
