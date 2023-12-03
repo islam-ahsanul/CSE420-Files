@@ -44,17 +44,14 @@ public:
     }
 
     void postOrderTraversal(std::ofstream& outFile) {
-    for (auto child : children) {
-        child->postOrderTraversal(outFile);
-    }
+        for (auto child : children) {
+            child->postOrderTraversal(outFile);
+        }
 
-    // Output both type and value for each node
-    // outFile << type;
-    if (!value.empty()) {
-        outFile << " " << value.c_str();
+        if (!value.empty()) {
+            outFile << " " << value;
+        }
     }
-    outFile << std::endl; 
-}
 
     ~TreeNode() {
         for (auto child : children) {
